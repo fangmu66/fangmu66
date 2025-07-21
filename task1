@@ -58,117 +58,76 @@ contract IntToRoman {
 }
 
     /**4.用 solidity 实现罗马数字转数整数
-     *  题目描述在 https://leetcode.cn/problems/roman-to-integer/description/3.
-     * 得先判断这个位  是百位还是千位 不然算不出来
-     *
-     * 优先匹配长的罗马数字符号（如 "CM"、"IV"），
-     * 每次匹配成功就累加对应的值并跳过已匹配的字符，直到字符串末尾
-     */
-    function romanToInt(string memory s) public pure returns (uint256) {
-        string[13] memory romans = [
-            "M",
-            "CM",
-            "D",
-            "CD",
-            "C",
-            "XC",
-            "L",
-            "XL",
-            "X",
-            "IX",
-            "V",
-            "IV",
-            "I"
-        ];
-        uint16[13] memory values = [
-            1000,
-            900,
-            500,
-            400,
-            100,
-            90,
-            50,
-            40,
-            10,
-            9,
-            5,
-            4,
-            1
-        ];
-        //先转成bytes
-        bytes memory strBytes = bytes(s);
-        uint256 i = 0;
-        uint256 res = 0;
-        while (i < strBytes.length) {
-            bool matched = false;
-            // 优先匹配两个字符的罗马数字
-            for (uint j = 0; j < 13; j++) {
-                //拿到romans的字符
-                bytes memory romanBytes = bytes(romans[j]);
-                //如果是2位的  并且 当前位+1 小于strBytes的长度（意思是还在这个strBytes里面） 并且strBytes 当前位的字符等于romanBytes第一位  下一位等于romanBytes第二位
-                if (
-                    romanBytes.length == 2 &&
-                    i + 1 < strBytes.length &&
-                    strBytes[i] == romanBytes[0] &&
-                    strBytes[i + 1] == romanBytes[1]
-                ) {
-                    res += values[j]; //把对应的整数加上
-                    i += 2; //因为是2位的 所以跳过2个
-                    matched = true;
-                    break;
-                }
-                // 匹配单字符
-                if (romanBytes.length == 1 && strBytes[i] == romanBytes[0]) {
-                    res += values[j];
-                    i += 1;
-                    matched = true;
-                    break;
-                }
-            }
-            // 如果没有匹配到，说明输入有误，直接跳出
-            if (!matched) {
-                break;
-            }
-        }
-        return res;
+    //将罗马数字转换成整数
+
+
+contract romanTtointContract{
+
+    mapping (string => uint256) public numeralMapping;
+    constructor(){
+        numeralMapping["I"] = 1;
+        numeralMapping["V"] = 5;
+        numeralMapping["X"] = 10;
+        numeralMapping["L"] = 50;
+        numeralMapping["C"] = 100;
+        numeralMapping["D"] = 500;
+        numeralMapping["M"] = 1000;
     }
-    /**
-     * 5.合并两个有序数组 (Merge Sorted Array)
-     *  题目描述：将两个有序数组合并为一个有序数组。
-     * [1,3,5,7,9]
-     * [2,4,6,8,10]
-     *
-     */
-    function mergeArray(
-        uint256[] memory arr1,
-        uint256[] memory arr2
-    ) public pure returns (uint256[] memory) {
-        //结束条件  当两个指针都大于数组长度的时候
-        uint i = 0; //arr1 的指针
-        uint j = 0; //arr2 的指针
-        uint m = 0; //result 的指针
-        uint k = arr1.length; //arr1 的数组长度
-        uint l = arr2.length; //arr2 的数组长度
-        uint256[] memory result = new uint256[](k + l);
-        while (i < k && j < l) {
-            if (arr1[i] < arr2[j]) {
-                result[m] = arr1[i];
-                i++;
-            } else {
-                result[m] = arr2[j];
-                j++;
+
+    function romanStringToInt(string memory ronman) public view returns (uint){
+        bytes memory ronmanBytes = bytes(ronman);
+        uint beforeNum;
+        uint totalNum;
+        for (uint i=0; i < ronmanBytes.length; i++){
+            uint j = numeralMapping[string(abi.encodePacked((ronmanBytes[i])))];
+            if( j != 0 && j > beforeNum){
+                j = j - 2*beforeNum ;
             }
-            m++;
+            beforeNum = j;
+            totalNum += j;
         }
-        // 补充剩余部分
-        while (i < k) {
-            result[m++] = arr1[i++];
-        }
-        while (j < l) {
-            result[m++] = arr2[j++];
-        }
-        return result;
+        return totalNum;
     }
+
+}
+5.将两个有序数组合并为一个有序数组。
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8;
+
+
+contract MergeArrayContract{
+    uint[] public a = [1,3,5,7,9];
+    uint[] public b = [2,4,6,8,10,11, 12];
+    uint[] public c = new uint[](a.length + b.length);
+
+    function mergeArrayFucn() public {
+        uint al = a.length;
+        uint bl = b.length;
+        uint ai = 0;
+        uint bi = 0;
+        uint ci = 0;
+
+        while (ai < al && bi< bl){
+            if (a[ai] > b[bi]) {
+                c[ci++] = b[bi];
+                bi ++;
+            } else{
+                c[ci++] = a[ai];
+                ai += 1;
+            }
+        }
+
+        while (ai < al && ci<bl){
+            c[ci++] = a[ai];
+            ai++;
+        }
+        while (bi < bl) {
+            c[ci++] = b[bi];
+            bi++;
+        }
+    }
+}
+
     /**
      * 6.二分查找 (Binary Search)
      * 题目描述：在一个有序数组中查找目标值。
